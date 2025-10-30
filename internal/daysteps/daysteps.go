@@ -11,10 +11,8 @@ import (
 )
 
 const (
-	// Длина одного шага в метрах
-	stepLength = 0.65
-	// Количество метров в одном километре
-	mInKm = 1000
+	stepLengthCoefficient = 0.45
+	mInKm                 = 1000
 )
 
 // parsePackage парсит строку с данными о шагах и продолжительности
@@ -53,27 +51,28 @@ func parsePackage(data string) (int, time.Duration, error) {
 	return steps, duration, nil
 }
 
-// DayActionInfo возвращает информацию о дневной активности
+// DayActionInfo обрабатывает данные о дне и возвращает информацию о действии
 func DayActionInfo(data string, weight, height float64) string {
 	steps, duration, err := parsePackage(data)
 	if err != nil {
-		// ДОБАВЛЯЕМ ВЫВОД ОШИБКИ В ЛОГ
+		// ЛОГИРОВАНИЕ ОШИБОК - добавлено
 		log.Println(err)
 		return ""
 	}
 
 	// Вычисляем дистанцию
-	distance := (float64(steps) * stepLength) / mInKm
+	stepLength := height * stepLengthCoefficient
+	distance := float64(steps) * stepLength / mInKm
 
 	// Вычисляем калории
 	kcal, err := spentcalories.WalkingSpentCalories(steps, weight, height, duration)
 	if err != nil {
-		// ДОБАВЛЯЕМ ВЫВОД ОШИБКИ В ЛОГ
+		// ЛОГИРОВАНИЕ ОШИБОК - добавлено
 		log.Println(err)
 		return ""
 	}
 
-	// УБИРАЕМ лишний перенос строки в конце!
+	// УДАЛЕН завершающий символ новой строки
 	return fmt.Sprintf("Количество шагов: %d.\nДистанция составила %.2f км.\nВы сожгли %.2f ккал.",
 		steps, distance, kcal)
 }
