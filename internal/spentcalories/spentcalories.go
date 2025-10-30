@@ -9,38 +9,50 @@ import (
 )
 
 const (
-	// Коэффициент длины шага
-	stepLengthCoefficient = 0.414
+	// Коэффициент длины шага (ИСПРАВЛЕНО!)
+	stepLengthCoefficient = 0.45
 	// Количество метров в одном километре
 	mInKm = 1000
 	// Количество минут в часе
 	minInH = 60
-	// Корректирующий коэффициент для ходьбы
-	walkingCaloriesCoefficient = 0.035
+	// Корректирующий коэффициент для ходьбы (ИСПРАВЛЕНО!)
+	walkingCaloriesCoefficient = 0.5
 )
 
 // parseTraining парсит строку с данными о тренировке
 func parseTraining(data string) (int, string, time.Duration, error) {
+	if data == "" {
+		return 0, "", 0, fmt.Errorf("empty input")
+	}
+
 	parts := strings.Split(data, ",")
 	if len(parts) != 3 {
 		return 0, "", 0, fmt.Errorf("invalid format: expected 'steps,activity,duration'")
 	}
 
-	// Парсим шаги
-	stepsStr := strings.TrimSpace(parts[0])
+	// Парсим шаги - БЕЗ обрезки пробелов!
+	stepsStr := parts[0]
 	steps, err := strconv.Atoi(stepsStr)
 	if err != nil {
 		return 0, "", 0, fmt.Errorf("invalid steps format: %v", err)
 	}
 
 	// Вид активности
-	activity := strings.TrimSpace(parts[1])
+	activity := parts[1]
 
-	// Парсим продолжительность
-	durationStr := strings.TrimSpace(parts[2])
+	// Парсим продолжительность - БЕЗ обрезки пробелов!
+	durationStr := parts[2]
 	duration, err := time.ParseDuration(durationStr)
 	if err != nil {
 		return 0, "", 0, fmt.Errorf("invalid duration format: %v", err)
+	}
+
+	// Проверяем валидность данных
+	if steps <= 0 {
+		return 0, "", 0, fmt.Errorf("steps must be positive")
+	}
+	if duration <= 0 {
+		return 0, "", 0, fmt.Errorf("duration must be positive")
 	}
 
 	return steps, activity, duration, nil
@@ -77,7 +89,6 @@ func RunningSpentCalories(steps int, weight, height float64, duration time.Durat
 	speed := meanSpeed(steps, height, duration)
 	durationMinutes := duration.Minutes()
 
-	// Формула для бега: (вес * скорость * время_в_минутах) / 60
 	calories := (weight * speed * durationMinutes) / minInH
 	return calories, nil
 }
@@ -91,7 +102,6 @@ func WalkingSpentCalories(steps int, weight, height float64, duration time.Durat
 	speed := meanSpeed(steps, height, duration)
 	durationMinutes := duration.Minutes()
 
-	// Формула для ходьбы: ((вес * скорость * время_в_минутах) / 60) * коэффициент
 	calories := (weight * speed * durationMinutes) / minInH
 	calories *= walkingCaloriesCoefficient
 
@@ -127,6 +137,7 @@ func TrainingInfo(data string, weight, height float64) (string, error) {
 	dist := distance(steps, height)
 	speed := meanSpeed(steps, height, duration)
 
+	// УБИРАЕМ лишний перенос строки в конце!
 	result := fmt.Sprintf("Тип тренировки: %s\nДлительность: %.2f ч.\nДистанция: %.2f км.\nСкорость: %.2f км/ч\nСожгли калорий: %.2f",
 		activity, duration.Hours(), dist, speed, calories)
 
