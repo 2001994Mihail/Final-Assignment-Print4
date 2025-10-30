@@ -16,7 +16,7 @@ const (
 	// Количество минут в часе
 	minInH = 60
 	// Корректирующий коэффициент для ходьбы
-	walkingCaloriesCoefficient = 0.029
+	walkingCaloriesCoefficient = 0.035
 )
 
 // parseTraining парсит строку с данными о тренировке
@@ -77,6 +77,7 @@ func RunningSpentCalories(steps int, weight, height float64, duration time.Durat
 	speed := meanSpeed(steps, height, duration)
 	durationMinutes := duration.Minutes()
 
+	// Формула для бега: (вес * скорость * время_в_минутах) / 60
 	calories := (weight * speed * durationMinutes) / minInH
 	return calories, nil
 }
@@ -90,6 +91,7 @@ func WalkingSpentCalories(steps int, weight, height float64, duration time.Durat
 	speed := meanSpeed(steps, height, duration)
 	durationMinutes := duration.Minutes()
 
+	// Формула для ходьбы: ((вес * скорость * время_в_минутах) / 60) * коэффициент
 	calories := (weight * speed * durationMinutes) / minInH
 	calories *= walkingCaloriesCoefficient
 
