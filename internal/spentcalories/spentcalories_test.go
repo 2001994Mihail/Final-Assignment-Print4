@@ -158,8 +158,8 @@ func (suite *SpentCaloriesTestSuite) TestRunningSpentCalories_ValidInput() {
 		suite.Run(tt.name, func() {
 			got, err := RunningSpentCalories(tt.steps, tt.weight, tt.height, tt.duration)
 			assert.NoError(suite.T(), err)
-			// Используем более широкий допуск для плавающей точки
-			assert.InEpsilon(suite.T(), tt.want, got, 0.001)
+			// Используем InDelta с допуском вместо InEpsilon
+			assert.InDelta(suite.T(), tt.want, got, 0.01)
 		})
 	}
 }
@@ -254,7 +254,7 @@ func (suite *SpentCaloriesTestSuite) TestWalkingSpentCalories_ValidInput() {
 			weight:   75.0,
 			height:   1.75,
 			duration: time.Hour,
-			// С коэффициентом 0.5 для ходьбы: 354.375 * 0.5 = 177.1875
+			// Ходьба с коэффициентом 0.5: 354.375 * 0.5 = 177.1875
 			want: 177.1875,
 		},
 		{
@@ -263,7 +263,7 @@ func (suite *SpentCaloriesTestSuite) TestWalkingSpentCalories_ValidInput() {
 			weight:   75.0,
 			height:   1.75,
 			duration: time.Hour,
-			// 177.1875 * 0.5 = 88.59375
+			// Ходьба с коэффициентом 0.5: 177.1875 * 0.5 = 88.59375
 			want: 88.59375,
 		},
 		{
@@ -272,7 +272,7 @@ func (suite *SpentCaloriesTestSuite) TestWalkingSpentCalories_ValidInput() {
 			weight:   75.0,
 			height:   1.75,
 			duration: time.Hour,
-			// 1181.25 * 0.5 = 590.625
+			// Ходьба с коэффициентом 0.5: 1181.25 * 0.5 = 590.625
 			want: 590.625,
 		},
 		{
@@ -281,7 +281,7 @@ func (suite *SpentCaloriesTestSuite) TestWalkingSpentCalories_ValidInput() {
 			weight:   60.0,
 			height:   1.75,
 			duration: time.Hour,
-			// 283.5 * 0.5 = 141.75
+			// Ходьба с коэффициентом 0.5: 283.5 * 0.5 = 141.75
 			want: 141.75,
 		},
 	}
@@ -290,7 +290,8 @@ func (suite *SpentCaloriesTestSuite) TestWalkingSpentCalories_ValidInput() {
 		suite.Run(tt.name, func() {
 			got, err := WalkingSpentCalories(tt.steps, tt.weight, tt.height, tt.duration)
 			assert.NoError(suite.T(), err)
-			assert.InEpsilon(suite.T(), tt.want, got, 0.001)
+			// Используем InDelta с допуском вместо InEpsilon
+			assert.InDelta(suite.T(), tt.want, got, 0.01)
 		})
 	}
 }
@@ -364,7 +365,7 @@ func (suite *SpentCaloriesTestSuite) TestTrainingInfo_ValidInput() {
 			data:   "6000,Ходьба,30m",
 			weight: 75.0,
 			height: 1.75,
-			// Ходьба 30 минут: 177.1875 * 0.5 = 88.59375 ≈ 88.59
+			// Ходьба 30 минут: (354.375 * 0.5) / 2 = 88.59375 ≈ 88.59
 			want: "Тип тренировки: Ходьба\nДлительность: 0.50 ч.\nДистанция: 4.72 км.\nСкорость: 9.45 км/ч\nСожгли калорий: 88.59",
 		},
 		{
@@ -372,7 +373,7 @@ func (suite *SpentCaloriesTestSuite) TestTrainingInfo_ValidInput() {
 			data:   "6000,Бег,30m",
 			weight: 75.0,
 			height: 1.75,
-			// Бег 30 минут: 354.375 * 0.5 = 177.1875 ≈ 177.19
+			// Бег 30 минут: 354.375 / 2 = 177.1875 ≈ 177.19
 			want: "Тип тренировки: Бег\nДлительность: 0.50 ч.\nДистанция: 4.72 км.\nСкорость: 9.45 км/ч\nСожгли калорий: 177.19",
 		},
 		{
