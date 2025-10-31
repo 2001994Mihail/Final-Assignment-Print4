@@ -8,10 +8,10 @@ import (
 )
 
 const (
-	stepLengthCoefficient      = 0.37 // Исправить на 0.37
+	stepLengthCoefficient      = 0.37
 	mInKm                      = 1000
 	minInH                     = 60
-	walkingCaloriesCoefficient = 0.5 // Исправить на 0.5
+	walkingCaloriesCoefficient = 0.5
 )
 
 // parseTraining парсит строку с данными о тренировке
