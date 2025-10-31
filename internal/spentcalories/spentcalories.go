@@ -11,7 +11,7 @@ const (
 	stepLengthCoefficient      = 0.45
 	mInKm                      = 1000
 	minInH                     = 60
-	walkingCaloriesCoefficient = 0.5
+	walkingCaloriesCoefficient = 0.035
 )
 
 // parseTraining парсит строку с данными о тренировке
@@ -126,7 +126,7 @@ func TrainingInfo(data string, weight, height float64) (string, error) {
 	case "ходьба":
 		calories, err = WalkingSpentCalories(steps, weight, height, duration)
 	default:
-		return "", fmt.Errorf("unknown activity: %s", activity)
+		return "", fmt.Errorf("неизвестный тип тренировки")
 	}
 
 	if err != nil {
