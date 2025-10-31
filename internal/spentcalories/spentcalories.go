@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	stepLengthCoefficient      = 0.37
+	stepLengthCoefficient      = 0.45
 	mInKm                      = 1000
 	minInH                     = 60
 	walkingCaloriesCoefficient = 0.5

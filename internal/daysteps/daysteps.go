@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	stepLengthCoefficient = 0.37
+	stepLengthCoefficient = 0.45
 	mInKm                 = 1000
 )
 
