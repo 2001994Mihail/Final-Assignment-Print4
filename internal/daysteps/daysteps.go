@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	stepLengthCoefficient = 0.45
+	stepLengthCoefficient = 0.37 // Исправить на 0.37
 	mInKm                 = 1000
 )
 

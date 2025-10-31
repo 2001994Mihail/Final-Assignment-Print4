@@ -8,10 +8,10 @@ import (
 )
 
 const (
-	stepLengthCoefficient      = 0.45
+	stepLengthCoefficient      = 0.37 // Исправить на 0.37
 	mInKm                      = 1000
 	minInH                     = 60
-	walkingCaloriesCoefficient = 0.035
+	walkingCaloriesCoefficient = 0.5 // Исправить на 0.5
 )
 
 // parseTraining парсит строку с данными о тренировке
@@ -76,6 +76,9 @@ func RunningSpentCalories(steps int, weight, height float64, duration time.Durat
 	if height <= 0 {
 		return 0, fmt.Errorf("height must be positive")
 	}
+	if steps <= 0 {
+		return 0, fmt.Errorf("steps must be positive")
+	}
 	if duration <= 0 {
 		return 0, fmt.Errorf("duration must be positive")
 	}
@@ -95,6 +98,9 @@ func WalkingSpentCalories(steps int, weight, height float64, duration time.Durat
 	}
 	if height <= 0 {
 		return 0, fmt.Errorf("height must be positive")
+	}
+	if steps <= 0 {
+		return 0, fmt.Errorf("steps must be positive")
 	}
 	if duration <= 0 {
 		return 0, fmt.Errorf("duration must be positive")
