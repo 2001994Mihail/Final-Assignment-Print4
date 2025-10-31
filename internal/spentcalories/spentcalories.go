@@ -87,6 +87,7 @@ func RunningSpentCalories(steps int, weight, height float64, duration time.Durat
 	durationMinutes := duration.Minutes()
 
 	// Формула для бега: (вес * скорость * время_в_минутах) / 60
+	// БЕЗ коэффициента для бега!
 	calories := (weight * speed * durationMinutes) / minInH
 	return calories, nil
 }
@@ -110,8 +111,9 @@ func WalkingSpentCalories(steps int, weight, height float64, duration time.Durat
 	durationMinutes := duration.Minutes()
 
 	// Формула для ходьбы: ((вес * скорость * время_в_минутах) / 60) * коэффициент
+	// С коэффициентом 0.5 для ходьбы!
 	calories := (weight * speed * durationMinutes) / minInH
-	calories *= walkingCaloriesCoefficient
+	calories *= walkingCaloriesCoefficient // ← ВАЖНО: применяем коэффициент для ходьбы!
 
 	return calories, nil
 }
