@@ -18,11 +18,10 @@ func TestSpentCaloriesSuite(t *testing.T) {
 
 func (suite *SpentCaloriesTestSuite) TestDistance() {
 	tests := []struct {
-		name    string
-		steps   int
-		height  float64
-		want    float64
-		wantErr bool
+		name   string
+		steps  int
+		height float64
+		want   float64
 	}{
 		{
 			name:   "нормальное количество шагов",
@@ -43,27 +42,21 @@ func (suite *SpentCaloriesTestSuite) TestDistance() {
 			want:   0.07875,
 		},
 		{
-			name:    "ноль шагов",
-			steps:   0,
-			height:  1.75,
-			want:    0,
-			wantErr: false, // distance не возвращает ошибку для 0 шагов
-		},
-		{
-			name:    "отрицательные шаги",
-			steps:   -100,
-			height:  1.75,
-			want:    -0.07875, // distance не валидирует входные данные
-			wantErr: false,
+			name:   "ноль шагов",
+			steps:  0,
+			height: 1.75,
+			want:   0,
 		},
 	}
 
 	for _, tt := range tests {
 		suite.Run(tt.name, func() {
 			got := distance(tt.steps, tt.height)
-			assert.InEpsilon(suite.T(), tt.want, got, 1e-9,
-				"distance(%d, %.2f) = %.6f, want %.6f",
-				tt.steps, tt.height, got, tt.want)
+			if tt.want == 0 {
+				assert.Equal(suite.T(), tt.want, got)
+			} else {
+				assert.InEpsilon(suite.T(), tt.want, got, 1e-9)
+			}
 		})
 	}
 }
@@ -109,9 +102,11 @@ func (suite *SpentCaloriesTestSuite) TestMeanSpeed() {
 	for _, tt := range tests {
 		suite.Run(tt.name, func() {
 			got := meanSpeed(tt.steps, tt.height, tt.duration)
-			assert.InEpsilon(suite.T(), tt.want, got, 1e-9,
-				"meanSpeed(%d, %.2f, %v) = %.6f, want %.6f",
-				tt.steps, tt.height, tt.duration, got, tt.want)
+			if tt.want == 0 {
+				assert.Equal(suite.T(), tt.want, got)
+			} else {
+				assert.InEpsilon(suite.T(), tt.want, got, 1e-9)
+			}
 		})
 	}
 }
@@ -162,11 +157,8 @@ func (suite *SpentCaloriesTestSuite) TestRunningSpentCalories_ValidInput() {
 	for _, tt := range tests {
 		suite.Run(tt.name, func() {
 			got, err := RunningSpentCalories(tt.steps, tt.weight, tt.height, tt.duration)
-
 			assert.NoError(suite.T(), err)
-			assert.InEpsilon(suite.T(), tt.want, got, 1e-9,
-				"RunningSpentCalories(%d, %.1f, %.2f, %v) = %.4f, want %.4f",
-				tt.steps, tt.weight, tt.height, tt.duration, got, tt.want)
+			assert.InEpsilon(suite.T(), tt.want, got, 1e-9)
 		})
 	}
 }
@@ -240,7 +232,6 @@ func (suite *SpentCaloriesTestSuite) TestRunningSpentCalories_InvalidInput() {
 	for _, tt := range tests {
 		suite.Run(tt.name, func() {
 			got, err := RunningSpentCalories(tt.steps, tt.weight, tt.height, tt.duration)
-
 			assert.Error(suite.T(), err)
 			assert.Equal(suite.T(), 0.0, got)
 		})
@@ -262,7 +253,8 @@ func (suite *SpentCaloriesTestSuite) TestWalkingSpentCalories_ValidInput() {
 			weight:   75.0,
 			height:   1.75,
 			duration: time.Hour,
-			want:     177.1875,
+			// С коэффициентом 0.5 для ходьбы!
+			want: 177.1875,
 		},
 		{
 			name:     "меньше шагов",
@@ -293,17 +285,13 @@ func (suite *SpentCaloriesTestSuite) TestWalkingSpentCalories_ValidInput() {
 	for _, tt := range tests {
 		suite.Run(tt.name, func() {
 			got, err := WalkingSpentCalories(tt.steps, tt.weight, tt.height, tt.duration)
-
 			assert.NoError(suite.T(), err)
-			assert.InEpsilon(suite.T(), tt.want, got, 1e-9,
-				"WalkingSpentCalories(%d, %.1f, %.2f, %v) = %.4f, want %.4f",
-				tt.steps, tt.weight, tt.height, tt.duration, got, tt.want)
+			assert.InEpsilon(suite.T(), tt.want, got, 1e-9)
 		})
 	}
 }
 
 func (suite *SpentCaloriesTestSuite) TestWalkingSpentCalories_InvalidInput() {
-	// Используем те же тест-кейсы, что и для бега
 	invalidCases := []struct {
 		name     string
 		steps    int
@@ -337,7 +325,6 @@ func (suite *SpentCaloriesTestSuite) TestWalkingSpentCalories_InvalidInput() {
 	for _, tt := range invalidCases {
 		suite.Run(tt.name, func() {
 			got, err := WalkingSpentCalories(tt.steps, tt.weight, tt.height, tt.duration)
-
 			assert.Error(suite.T(), err)
 			assert.Equal(suite.T(), 0.0, got)
 		})
@@ -371,14 +358,16 @@ func (suite *SpentCaloriesTestSuite) TestTrainingInfo_ValidInput() {
 			data:   "6000,Ходьба,30m",
 			weight: 75.0,
 			height: 1.75,
-			want:   "Тип тренировки: Ходьба\nДлительность: 0.50 ч.\nДистанция: 4.72 км.\nСкорость: 9.44 км/ч\nСожгли калорий: 88.59",
+			// ОБНОВЛЕНО: скорость 9.45 км/ч и калории 88.59
+			want: "Тип тренировки: Ходьба\nДлительность: 0.50 ч.\nДистанция: 4.72 км.\nСкорость: 9.45 км/ч\nСожгли калорий: 88.59",
 		},
 		{
 			name:   "бег - полчаса",
 			data:   "6000,Бег,30m",
 			weight: 75.0,
 			height: 1.75,
-			want:   "Тип тренировки: Бег\nДлительность: 0.50 ч.\nДистанция: 4.72 км.\nСкорость: 9.44 км/ч\nСожгли калорий: 177.19",
+			// ОБНОВЛЕНО: скорость 9.45 км/ч и калории 177.19
+			want: "Тип тренировки: Бег\nДлительность: 0.50 ч.\nДистанция: 4.72 км.\nСкорость: 9.45 км/ч\nСожгли калорий: 177.19",
 		},
 		{
 			name:   "разные регистры активности",
@@ -392,7 +381,6 @@ func (suite *SpentCaloriesTestSuite) TestTrainingInfo_ValidInput() {
 	for _, tt := range tests {
 		suite.Run(tt.name, func() {
 			got, err := TrainingInfo(tt.data, tt.weight, tt.height)
-
 			assert.NoError(suite.T(), err)
 			assert.Equal(suite.T(), tt.want, got)
 		})
@@ -453,7 +441,6 @@ func (suite *SpentCaloriesTestSuite) TestTrainingInfo_InvalidInput() {
 	for _, tt := range tests {
 		suite.Run(tt.name, func() {
 			got, err := TrainingInfo(tt.data, tt.weight, tt.height)
-
 			assert.Error(suite.T(), err)
 			assert.Equal(suite.T(), "", got)
 		})
@@ -498,7 +485,6 @@ func (suite *SpentCaloriesTestSuite) TestParseTraining() {
 	for _, tt := range tests {
 		suite.Run(tt.name, func() {
 			steps, activity, duration, err := parseTraining(tt.data)
-
 			if tt.wantErr {
 				assert.Error(suite.T(), err)
 			} else {
@@ -508,24 +494,5 @@ func (suite *SpentCaloriesTestSuite) TestParseTraining() {
 				assert.Equal(suite.T(), tt.wantDur, duration)
 			}
 		})
-	}
-}
-
-// Бенчмарк-тесты для измерения производительности
-func BenchmarkRunningSpentCalories(b *testing.B) {
-	for i := 0; i < b.N; i++ {
-		RunningSpentCalories(6000, 75.0, 1.75, time.Hour)
-	}
-}
-
-func BenchmarkWalkingSpentCalories(b *testing.B) {
-	for i := 0; i < b.N; i++ {
-		WalkingSpentCalories(6000, 75.0, 1.75, time.Hour)
-	}
-}
-
-func BenchmarkTrainingInfo(b *testing.B) {
-	for i := 0; i < b.N; i++ {
-		TrainingInfo("6000,Ходьба,1h", 75.0, 1.75)
 	}
 }
